@@ -13,6 +13,14 @@ from whisperx.diarize import DiarizationPipeline, assign_word_speakers
 from whisperx.types import AlignedTranscriptionResult, TranscriptionResult
 from whisperx.utils import LANGUAGES, TO_LANGUAGE_CODE, get_writer
 
+# Try to load environment variables
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    # dotenv not installed, that's ok
+    pass
+
 
 def transcribe_task(args: dict, parser: argparse.ArgumentParser):
     """Transcription task to be called from CLI.
@@ -33,6 +41,7 @@ def transcribe_task(args: dict, parser: argparse.ArgumentParser):
     device_index: int = args.pop("device_index")
     compute_type: str = args.pop("compute_type")
     verbose: bool = args.pop("verbose")
+    backend: str = args.pop("backend", "faster-whisper")  # NEW: Add backend parameter
 
     # model_flush: bool = args.pop("model_flush")
     os.makedirs(output_dir, exist_ok=True)
@@ -134,6 +143,7 @@ def transcribe_task(args: dict, parser: argparse.ArgumentParser):
         task=task,
         local_files_only=model_cache_only,
         threads=faster_whisper_threads,
+        backend=backend,  # NEW: Pass backend parameter
     )
 
     for audio_path in args.pop("audio"):
@@ -200,9 +210,14 @@ def transcribe_task(args: dict, parser: argparse.ArgumentParser):
     # >> Diarize
     if diarize:
         if hf_token is None:
-            print(
-                "Warning, no --hf_token used, needs to be saved in environment variable, otherwise will throw error loading diarization model..."
-            )
+            # Try to get token from environment
+            hf_token = os.environ.get("HF_TOKEN")
+            if hf_token is None:
+                print(
+                    "Warning: No --hf_token provided and HF_TOKEN environment variable not found."
+                    "\nPlease provide a token with --hf_token or set HF_TOKEN in your .env file."
+                    "\nSee .env.example for instructions on getting a token."
+                )
         tmp_results = results
         print(">>Performing diarization...")
         print(">>Using model:", diarize_model_name)

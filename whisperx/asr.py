@@ -14,6 +14,7 @@ from transformers.pipelines.pt_utils import PipelineIterator
 from whisperx.audio import N_SAMPLES, SAMPLE_RATE, load_audio, log_mel_spectrogram
 from whisperx.types import SingleSegment, TranscriptionResult
 from whisperx.vads import Vad, Silero, Pyannote
+from typing import Union
 
 
 def find_numeral_symbol_tokens(tokenizer):
@@ -313,7 +314,8 @@ def load_model(
     download_root: Optional[str] = None,
     local_files_only=False,
     threads=4,
-) -> FasterWhisperPipeline:
+    backend: str = "faster-whisper",  # NEW: Add backend parameter
+) -> Union[FasterWhisperPipeline, "MLXWhisperPipeline"]:
     """Load a Whisper model for inference.
     Args:
         whisper_arch - The name of the Whisper model to load.
@@ -326,9 +328,33 @@ def load_model(
         download_root - The root directory to download the model to.
         local_files_only - If `True`, avoid downloading the file and return the path to the local cached file if it exists.
         threads - The number of cpu threads to use per worker, e.g. will be multiplied by num workers.
+        backend - The backend to use ("faster-whisper" or "mlx").
     Returns:
         A Whisper pipeline.
     """
+    
+    # Handle MLX backend
+    if backend == "mlx":
+        try:
+            from whisperx.mlx_asr import load_mlx_model
+            print(f"Using MLX backend for transcription on Apple Silicon")
+            return load_mlx_model(
+                model_name=whisper_arch,
+                device=device,
+                compute_type=compute_type,
+                asr_options=asr_options,
+                language=language,
+                vad_model=vad_model,
+                vad_method=vad_method,
+                vad_options=vad_options,
+                task=task,
+                download_root=download_root,
+                suppress_numerals=asr_options.get("suppress_numerals", False) if asr_options else False,
+            )
+        except ImportError as e:
+            print(f"Error loading MLX backend: {e}")
+            print("Falling back to faster-whisper backend")
+            backend = "faster-whisper"
 
     if whisper_arch.endswith(".en"):
         language = "en"

@@ -35,6 +35,17 @@ This repository provides fast automatic speech recognition (70x realtime with la
 - 🎯 Accurate word-level timestamps using wav2vec2 alignment
 - 👯‍♂️ Multispeaker ASR using speaker diarization from [pyannote-audio](https://github.com/pyannote/pyannote-audio) (speaker ID labels)
 - 🗣️ VAD preprocessing, reduces hallucination & batching with no WER degradation
+- 🎯 **NEW**: MLX backend support for GPU acceleration on Apple Silicon (M1/M2/M3/M4)
+
+<h2 align="left">📚 Documentation</h2>
+
+**→ [View Full Documentation](docs/README.md)** - All documentation is organized in the `docs/` folder
+
+**Quick Links:**
+- [🚀 Quick Start (5 minutes)](docs/quickstart/QUICKSTART.md) - Get transcribing fast
+- [🍎 Apple Silicon Guide](docs/quickstart/README_MLX.md) - MLX GPU acceleration
+- [🔧 Technical Details](docs/technical/) - How it works
+- [👨‍💻 Developer Guide](docs/guides/AI_DEVELOPER_GUIDE.md) - Contributing
 
 **Whisper** is an ASR model [developed by OpenAI](https://github.com/openai/whisper), trained on a large dataset of diverse audio. Whilst it does produces highly accurate transcriptions, the corresponding timestamps are at the utterance-level, not per word, and can be inaccurate by several seconds. OpenAI's whisper does not natively support batching.
 
@@ -56,6 +67,64 @@ This repository provides fast automatic speech recognition (70x realtime with la
 - Paper drop🎓👨‍🏫! Please see our [ArxiV preprint](https://arxiv.org/abs/2303.00747) for benchmarking and details of WhisperX. We also introduce more efficient batch inference resulting in large-v2 with \*60-70x REAL TIME speed.
 
 <h2 align="left" id="setup">Setup ⚙️</h2>
+
+### 📖 Documentation Access
+
+**If you're viewing this on GitHub**, click the links above to browse documentation.
+
+**If you've cloned the repository:**
+```bash
+# Interactive documentation viewer
+./view_docs.sh
+
+# Or browse manually
+cd docs/
+cat README.md
+
+# Or open in your preferred editor
+code docs/  # VS Code
+open docs/  # macOS Finder
+```
+
+### 🚀 Quick Start for Apple Silicon (M1/M2/M3/M4)
+
+For GPU-accelerated transcription on Apple Silicon, see our [MLX Quick Start Guide](docs/quickstart/QUICKSTART.md):
+
+```bash
+git clone https://github.com/m-bain/whisperX.git && cd whisperX && ./setup_mlx_whisperx.sh
+```
+
+Then use with MLX backend:
+```bash
+whisperx audio.mp3 --backend mlx --model mlx-community/whisper-large-v3-mlx
+```
+
+### 📚 Documentation
+
+All documentation is organized in the `docs/` folder. Here's how to access it:
+
+**Browse Online (GitHub):**
+- [Documentation Index](docs/README.md) - Start here for all documentation
+- [Quick Start Guide](docs/quickstart/QUICKSTART.md) - Get started in 5 minutes
+- [Complete Setup Guide](docs/quickstart/WHISPERX_MLX_SETUP.md) - Detailed installation
+
+**Browse Locally (After Cloning):**
+```bash
+# View documentation index
+cat docs/README.md
+
+# Quick start guide
+cat docs/quickstart/QUICKSTART.md
+
+# View documentation structure
+ls -la docs/
+```
+
+**Key Documentation:**
+- `docs/quickstart/` - Getting started guides
+- `docs/technical/` - Implementation details
+- `docs/guides/` - Developer guides and tutorials
+- `docs/benchmarks/` - Performance testing tools
 
 ### 1. Simple Installation (Recommended)
 

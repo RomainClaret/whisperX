@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import pandas as pd
 from pyannote.audio import Pipeline
@@ -18,6 +19,11 @@ class DiarizationPipeline:
         if isinstance(device, str):
             device = torch.device(device)
         model_config = model_name or "pyannote/speaker-diarization-3.1"
+        
+        # If no auth token provided, try to get from environment
+        if use_auth_token is None:
+            use_auth_token = os.environ.get("HF_TOKEN")
+            
         self.model = Pipeline.from_pretrained(model_config, use_auth_token=use_auth_token).to(device)
 
     def __call__(
